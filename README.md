@@ -92,6 +92,12 @@ If you for some reason are using custom `define` and `require` names, those can 
 
 And this will resolve correctly.
 
+For evaluating requirejs config, against interpreting, set "preferEval" option to true.
+
+Example:
+    
+    "requireModuleSupport.preferEval": true
+
 ### RequireJS Config Files
 
 RequireJS configuration properties like `paths`, `bundles` and `config` are usually maintained in a separate file in a single `require.config()` statement. This file can be evaluated, when the project is loaded on debug pages, when the project is built (for root components) and in other situations - like this editor plugin.

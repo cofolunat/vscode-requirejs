@@ -184,7 +184,10 @@ class ReferenceProvider {
 		 * @returns {Promise} resolves with file location
 		 */
 	searchModule (currentFilePath, modulePath, searchFor, stopSearchingFurther) {
-		const newUri = vscode.Uri.file(this.resolveModulePath(modulePath, currentFilePath));
+		const configFilePath = vscode.workspace.getConfiguration('requireModuleSupport').get("configFile");
+		const configRootPath = configFilePath.substr(0, configFilePath.lastIndexOf("/"));
+
+		let newUri = vscode.Uri.file(`${vscode.workspace.rootPath}/${configRootPath}/${this.resolveModulePath(modulePath, currentFilePath)}`);
 		const newDocument = vscode.workspace.openTextDocument(newUri);
 
 		return new Promise(resolve => {
@@ -233,7 +236,7 @@ class ReferenceProvider {
 				if (!found || onlyNavigateToFile) {
 					resolve(new vscode.Location(newUri, new vscode.Position(0, 0)));
 				}
-			}, () => resolve(undefined));
+			}, (error) => resolve(undefined));
 		});
 	}
 
@@ -312,7 +315,7 @@ class ReferenceProvider {
 
 		for (let i = 0; i < requireOrDefineStatements.length; i++) {
 			if (caretPosition >= requireOrDefineStatements[i].start
-								&& (!requireOrDefineStatements[i].end || caretPosition <= requireOrDefineStatements[i].end)) {
+				&& (!requireOrDefineStatements[i].end || caretPosition <= requireOrDefineStatements[i].end)) {
 				foundSection = requireOrDefineStatements[i];
 			}
 		}
@@ -477,8 +480,12 @@ class ReferenceProvider {
 					vscode.commands.executeCommand('vscode.executeDefinitionProvider', document.uri, continueFrom).then(refs => {
 						for (let i = refs.length - 1; i >= 0; i--) {
 							// Discard if same file
-							if (refs[i].uri.fsPath === document.uri.fsPath) {
-								refs.splice(i, 1);
+							try {
+								if (refs[i].uri.fsPath === document.uri.fsPath) {
+									refs.splice(i, 1);
+								}
+							} catch (ex) {
+								continue;
 							}
 						}
 						resolve(refs);

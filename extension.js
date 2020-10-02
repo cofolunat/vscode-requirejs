@@ -26,10 +26,14 @@ function initializeRequireJs () {
 
 	if (configFile) {
 		const configContent = fs.readFileSync(path.join(rootPath, configFile), 'utf-8');
-		const config = amodroConfig.find(configContent);
+		if (requireModuleSupport.get('preferEval')) {
+			eval(configContent);
+		} else {
+			const config = amodroConfig.find(configContent);
 
-		if (config) {
-			requirejs.config(config);
+			if (config) {
+				requirejs.config(config);
+			}
 		}
 	}
 }

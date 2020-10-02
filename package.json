@@ -31,6 +31,11 @@
           "default": "",
           "description": "Module path relative to workspace root"
         },
+        "requireModuleSupport.preferEval": {
+          "type": "boolean",
+          "default": false,
+          "description": ""
+        },
         "requireModuleSupport.onlyNavigateToFile": {
           "type": "boolean",
           "default": false,
